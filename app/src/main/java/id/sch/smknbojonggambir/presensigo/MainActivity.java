@@ -31,7 +31,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.splashscreen.SplashScreen;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
@@ -48,13 +47,10 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefresh;
     private LinearLayout errorLayout;
     private Button btnRetry;
-
     private ValueCallback<Uri[]> filePathCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // 1. Integrasi Android 12+ Splash Screen API
-        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -63,10 +59,7 @@ public class MainActivity extends AppCompatActivity {
         setupSwipeRefresh();
         setupBackNavigation();
 
-        // 2. Minta Runtime Permission Hardware di awal aplikasi dibuka
         checkAndRequestHardwarePermissions();
-
-        // 3. Muat Portal PresensiGO SMKN Bojonggambir
         loadPortal();
     }
 
@@ -88,49 +81,46 @@ public class MainActivity extends AppCompatActivity {
     private void setupWebView() {
         WebSettings settings = webView.getSettings();
 
-        // Enable JavaScript & HTML5 Storage
+        // 1. JavaScript & Storage Support
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
 
-        // Enable Geolocation & Media Hardware
+        // 2. Hardware Access
         settings.setGeolocationEnabled(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
 
-        // Viewport & Scaling
+        // 3. Zoom & Viewport Controls
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
-        settings.setSupportZoom(true);
-        settings.setBuiltInZoomControls(true);
+        settings.setSupportZoom(false);
+        settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
 
-        // Cache & Security
+        // 4. Cache & Rendering Optimizations
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW); // Strict HTTPS
+        settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
 
-        // Custom User Agent Header
+        // 5. Custom User-Agent
         String defaultUA = settings.getUserAgentString();
-        settings.setUserAgentString(defaultUA + " PresensiGO-NativeApp/2.4.0 (SMKN Bojonggambir)");
+        settings.setUserAgentString(defaultUA + " PresensiGO-AndroidNative/2.4.0 (SMKN Bojonggambir)");
 
-        // WebChromeClient: Auto-Grant Hardware Izin Geolocation, Kamera & Audio
+        // WebChromeClient: Grant WebRTC Camera/Mic & GPS Geolocation
         webView.setWebChromeClient(new WebChromeClient() {
-            // Mengizinkan Akses Kamera & Mikrofon HTML5 WebRTC
             @Override
             public void onPermissionRequest(final PermissionRequest request) {
-                runOnUiThread(() -> {
-                    // Berikan semua resource yang diminta (VIDEO_CAPTURE, AUDIO_CAPTURE)
+                MainActivity.this.runOnUiThread(() -> {
+                    // Auto-grant kamera selfie & audio untuk portal PresensiGO
                     request.grant(request.getResources());
                 });
             }
 
-            // Mengizinkan Akses Lokasi/GPS HTML5
             @Override
             public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
-                // origin, allow = true, retain = false
+                // Auto-grant izin GPS untuk koordinat sekolah
                 callback.invoke(origin, true, false);
             }
 
-            // Indikator Progress Memuat Halaman
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 if (newProgress < 100) {
@@ -142,7 +132,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            // File Chooser untuk upload dokumen/foto
             @Override
             public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
                 if (MainActivity.this.filePathCallback != null) {
@@ -167,12 +156,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
-                // Jika URL berada di domain presensigo, buka di dalam WebView
                 if (url.startsWith("https://presensigo.smknbojonggambir.sch.id") || 
                     url.startsWith("https://smknbojonggambir.sch.id")) {
                     return false;
                 }
-                // Jika tautan eksternal (misal: WhatsApp / Maps), buka di aplikasi luar
                 try {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     startActivity(intent);
@@ -224,9 +211,6 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl(TARGET_URL);
     }
 
-    /**
-     * Memeriksa dan meminta runtime permission (Kamera, Lokasi GPS, Audio) Android 6.0+
-     */
     private void checkAndRequestHardwarePermissions() {
         List<String> permissionsNeeded = new ArrayList<>();
 
