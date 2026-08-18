@@ -1,0 +1,12 @@
+{
+  "name": "PresensiGO - SMKN Bojonggambir Android WebView & UI/UX Suite",
+  "description": "Aplikasi Android WebView Native PresensiGO SMKN Bojonggambir lengkap dengan simulator perangkat, izin hardware kamera/lokasi/audio, desain monogram P+G, Play Store icon 512px, Home screen adaptive icon, Splash screen flash burst, dan source code project Android Studio.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

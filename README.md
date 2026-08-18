@@ -1,15 +1,20 @@
-# PresensiGO - SMKN Bojonggambir Native Android WebView Project
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
 
-Aplikasi Android Native WebView resmi untuk portal presensi:
-https://presensigo.smknbojonggambir.sch.id/
+# Run and deploy your AI Studio app
 
-## 🚀 Auto-Build APK via GitHub Actions:
-Proyek ini sudah dilengkapi file workflow CI/CD di `.github/workflows/build-apk.yml`.
-Begitu Anda push repositori ini ke GitHub:
-1. GitHub Actions otomatis membangun file `.apk` via Gradle & JDK 17.
-2. File `PresensiGO-SMKN-Bojonggambir-v2.4.0-APK` dapat langsung diunduh dari tab **Actions > Artifacts**.
+This contains everything you need to run your app locally.
 
-## 💻 Cara Buka Manual di Android Studio:
-1. Ekstrak file ZIP ini.
-2. Buka Android Studio -> File -> Open -> Pilih folder proyek ini.
-3. Hubungkan HP Android atau Emulator, lalu klik Run (Shift + F10).
+View your app in AI Studio: https://ai.studio/apps/93be7c7c-a32e-4dcc-b940-e9f475f8da6a
+
+## Run Locally
+
+**Prerequisites:**  Node.js
+
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
